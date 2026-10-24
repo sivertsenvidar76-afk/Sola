@@ -19,14 +19,25 @@ class Client:
 with tempfile.TemporaryDirectory() as temp:
  copy=pathlib.Path(temp)/'app';shutil.copytree(root,copy,ignore=shutil.ignore_patterns('.git','var'));(copy/'var').mkdir()
  with socket.socket() as s:s.bind(('127.0.0.1',0));port=s.getsockname()[1]
+ nested=os.environ.get('SOLA_SUBDIR')=='1'
+ docroot=copy/'public'
+ if nested:
+  docroot=pathlib.Path(temp)/'www';docroot.mkdir();(docroot/'sola').symlink_to(copy/'public',target_is_directory=True)
  with open(pathlib.Path(temp)/'server.log','w+') as log:
-  proc=subprocess.Popen([os.environ.get('PHP_BIN','php'),'-S',f'127.0.0.1:{port}','-t',str(copy/'public')],stdout=log,stderr=log)
+  proc=subprocess.Popen([os.environ.get('PHP_BIN','php'),'-S',f'127.0.0.1:{port}','-t',str(docroot)],stdout=log,stderr=log)
   try:
-   base=f'http://127.0.0.1:{port}';admin=Client(base)
+   base=f'http://127.0.0.1:{port}'+('/sola' if nested else '');admin=Client(base)
    for _ in range(50):
     try:admin.get();break
     except OSError:time.sleep(.1)
    assert 'Opprett butikken' in admin.get()
+   home=admin.get()
+   css=re.search(r'href="([^"]+style.css[^"]*)"',home)
+   assert 'href="style.css?v=2"' in home
+   with admin.opener.open(urllib.parse.urljoin(base+'/', 'style.css?v=2')) as asset:
+    assert 'text/css' in asset.headers['Content-Type'] and b'.login' in asset.read()
+   with admin.opener.open(urllib.parse.urljoin(base+'/', 'app.js?v=2')) as asset:
+    assert b'lookup' in asset.read()
    admin.post(dict(action='setup',name='Butikkeier',email='admin@example.test',password='AdminPassword123!'))
    for n in (1,2):
     result=admin.post(dict(action='seller',name=f'Selger {n}',email=f's{n}@example.test',password='SellerPassword123!',share='80'))

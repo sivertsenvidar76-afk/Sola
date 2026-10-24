@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS sales(id INTEGER PRIMARY KEY,item_id INTEGER NOT NULL
 function query(string $sql,array $args=[]): PDOStatement {global $db;$s=$db->prepare($sql);$s->execute($args);return $s;}
 function e(mixed $s):string{return htmlspecialchars((string)$s,ENT_QUOTES,'UTF-8');}
 function money(int $v):string{return number_format($v/100,2,',',' ').' kr';}
-function go(string $path='/'):never{header('Location: '.$path);exit;}
+function go(string $path='/'):never{header('Location: ./'.ltrim($path,'/'));exit;}
 function user():?array{return isset($_SESSION['uid'])?(query('SELECT * FROM users WHERE id=?',[$_SESSION['uid']])->fetch()?:null):null;}
 function admin():void{if((user()['role']??'')!=='admin')throw new RuntimeException('Kun butikkansatte har tilgang.');}
 function csrf():string{return $_SESSION['csrf']??=bin2hex(random_bytes(32));}
