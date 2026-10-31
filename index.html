@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sjåfør- og maskinførerbooking</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header>
+        <h1>Lei inn sjåfør eller maskinfører</h1>
+        <p>
+          Tilgjengelig for buss, lastebil, maskinfører og vaktlignende oppdrag.
+          Jeg er <strong>ledig fra kl. 15:00 hver dag</strong>.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Tilgjengelig kalender (neste 30 dager)</h2>
+        <p class="hint">Ledig tidsrom: 15:00–23:00, alle dager.</p>
+        <div id="calendar" class="calendar" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <h2>Beregn timepris</h2>
+        <form id="booking-form" class="booking-form">
+          <label for="start">Starttid for oppdrag</label>
+          <input id="start" name="start" type="datetime-local" required />
+
+          <label for="duration">Varighet (timer)</label>
+          <input
+            id="duration"
+            name="duration"
+            type="number"
+            min="1"
+            max="24"
+            value="8"
+            required
+          />
+
+          <button type="submit">Beregn pris</button>
+        </form>
+
+        <div id="result" class="result" aria-live="polite"></div>
+
+        <ul class="pricing-rules">
+          <li><strong>14+ dager i forveien:</strong> Lav pris (550 kr/time)</li>
+          <li><strong>1–13 dager i forveien:</strong> Høy pris (750 kr/time)</li>
+          <li><strong>1–23 timer i forveien:</strong> Ekstra høy pris (950 kr/time)</li>
+          <li><strong>Mindre enn 1 time i forveien:</strong> Akuttpris (1200 kr/time)</li>
+        </ul>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
